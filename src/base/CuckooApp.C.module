@@ -1,0 +1,51 @@
+#include "CuckooApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<CuckooApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
+  return params;
+}
+
+CuckooApp::CuckooApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  CuckooApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  CuckooApp::associateSyntax(_syntax, _action_factory);
+}
+
+CuckooApp::~CuckooApp()
+{
+}
+
+// External entry point for dynamic application loading
+extern "C" void CuckooApp__registerApps() { CuckooApp::registerApps(); }
+void
+CuckooApp::registerApps()
+{
+  registerApp(CuckooApp);
+}
+
+// External entry point for dynamic object registration
+extern "C" void CuckooApp__registerObjects(Factory & factory) { CuckooApp::registerObjects(factory); }
+void
+CuckooApp::registerObjects(Factory & factory)
+{
+}
+
+// External entry point for dynamic syntax association
+extern "C" void CuckooApp__associateSyntax(Syntax & syntax, ActionFactory & action_factory) { CuckooApp::associateSyntax(syntax, action_factory); }
+void
+CuckooApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
